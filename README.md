@@ -27,6 +27,12 @@ The setup page checks your store before you connect and shows what needs attenti
 
 **The plugin is free. A WISEPIM account is required.** WISEPIM features and usage depend on your plan. See [plans and pricing](https://wisepim.com/pricing).
 
+## Need a hand?
+
+Read the [WooCommerce connection guide](https://docs.wisepim.com/en/integrations/woocommerce), or browse the [WISEPIM documentation](https://docs.wisepim.com) for importing products, writing content, and translating your catalog.
+
+Need help with your store? [Contact the WISEPIM team](https://wisepim.com/contact).
+
 ## Your store stays under your control
 
 Installing the plugin or clicking Connect does not import, edit, or publish products. You start those workflows in WISEPIM.

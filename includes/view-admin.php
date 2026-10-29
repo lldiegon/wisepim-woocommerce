@@ -86,7 +86,7 @@ defined( 'ABSPATH' ) || exit;
 		</section>
 
 		<section class="wisepim-help" aria-labelledby="wisepim-help-heading">
-			<div class="wisepim-help-title"><h2 id="wisepim-help-heading"><?php esc_html_e( 'A little help, if you need it.', 'wisepim-for-woocommerce' ); ?></h2><a href="https://wisepim.com/contact" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Talk to our team', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a></div>
+			<div class="wisepim-help-title"><h2 id="wisepim-help-heading"><?php esc_html_e( 'A little help, if you need it.', 'wisepim-for-woocommerce' ); ?></h2><div class="wisepim-help-links"><a href="https://docs.wisepim.com/en/integrations/woocommerce" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Read the documentation', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a><a href="https://wisepim.com/contact" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Talk to our team', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a></div></div>
 			<details><summary><?php esc_html_e( 'I have already connected my store', 'wisepim-for-woocommerce' ); ?></summary><div class="wisepim-detail-content"><p><?php esc_html_e( 'Open WISEPIM to check your connection, manage imports, or reconnect an existing store. If setup was interrupted, you can start again with the Connect button above.', 'wisepim-for-woocommerce' ); ?></p>
 				<?php if ( $last_attempt ) : ?>
 					<p class="wisepim-muted">

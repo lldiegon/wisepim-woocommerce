@@ -4,7 +4,7 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,15 @@ There are no API keys to copy. Open WooCommerce → WISEPIM in your WordPress da
 * Send your changes back to WooCommerce when you choose to export them.
 
 The plugin connects your store. You do the catalog work in WISEPIM. Installing the plugin or clicking Connect does not import, edit, or publish products.
+
+= Need a hand? =
+
+WooCommerce connection guide: https://docs.wisepim.com/en/integrations/woocommerce
+WISEPIM documentation: https://docs.wisepim.com
+
+Find help with connecting your store, importing products, improving content, and translating your catalog.
+
+Need help with your store? Contact the WISEPIM team: https://wisepim.com/contact
 
 = What you need =
 
@@ -81,6 +90,9 @@ The plugin removes its saved setup timestamp. Your products and WooCommerce API 
 Check the WISEPIM setup page first. WooCommerce must be active, your store must use HTTPS, and permalinks must not be set to Plain. If those checks pass but authorization fails, a hosting firewall or security plugin may be blocking WooCommerce access. Ask your store administrator to check it.
 
 == Changelog ==
+
+= 0.1.3 =
+* Add direct documentation and support links.
 
 = 0.1.2 =
 * Clarify product benefits, setup steps, pricing, and access controls.

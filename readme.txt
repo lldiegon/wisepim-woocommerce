@@ -4,72 +4,86 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connect WooCommerce to WISEPIM to manage and improve product content, with guided setup and no manual API-key copying.
+Connect your store to WISEPIM. Improve product descriptions, prepare translations, and manage your catalog. No API keys to copy.
 
 == Description ==
 
-WISEPIM for WooCommerce connects your store to the WISEPIM product information management service. Start from your WordPress dashboard, sign in or create a WISEPIM account, and approve access to your store.
+Write and translate WooCommerce product content in one place.
 
-The plugin detects your store URL and checks the local requirements before you connect. Product importing, content improvement, translation, and export workflows run in WISEPIM and depend on your service plan and settings.
+Connect your WooCommerce store to WISEPIM, import your catalog, and start improving your product content. You choose when to send changes back to your store.
 
-* Guided connection from your WooCommerce dashboard.
-* Local checks for WooCommerce, HTTPS, and pretty permalinks.
-* WooCommerce's built-in application authorization: no copying API keys.
-* Links to WISEPIM and WooCommerce API-key management.
-* No storefront scripts or background tracking added by this plugin.
+There are no API keys to copy. Open WooCommerce → WISEPIM in your WordPress dashboard, sign in or create an account, and approve access to your store.
 
-A WISEPIM account is required. Paid service plans may be required for particular service features or usage. Learn about the service at https://wisepim.com.
+= What you can do =
+
+* Improve product descriptions with WISEPIM's AI content tools.
+* Translate product content into the languages your customers use.
+* Manage product content across your catalog in one place.
+* Send your changes back to WooCommerce when you choose to export them.
+
+The plugin connects your store. You do the catalog work in WISEPIM. Installing the plugin or clicking Connect does not import, edit, or publish products.
+
+= What you need =
+
+The plugin is free. A WISEPIM account is required, and service features and usage depend on your plan. See https://wisepim.com/pricing for current plans.
+
+WooCommerce must be active, your store must use HTTPS, and WordPress permalinks must be set to something other than Plain. The setup page checks these requirements and shows what needs attention.
 
 = External service and data use =
 
-This plugin connects to WISEPIM, an external product information management service operated at https://wisepim.com.
+WISEPIM is an external product information management service at https://wisepim.com. It provides the catalog importing, content improvement, translation, and export tools used with this connector.
 
-Activation and local setup checks do not contact WISEPIM. After you click Connect to WISEPIM, your browser navigates to wisepim.com with your store URL, plugin version, and fixed campaign labels identifying the WordPress plugin referral source. No API keys are included in this link.
+Activating the plugin and viewing its setup checks do not contact WISEPIM. When you click Connect to WISEPIM, your browser opens wisepim.com with your store URL, the plugin version, and fixed referral labels identifying this WordPress connector. The link contains no API keys.
 
-After you sign in and approve access in WooCommerce, WooCommerce sends the generated API credentials directly to WISEPIM. The service uses the authorized WooCommerce API access to support your chosen catalog workflows. The plugin itself does not store those credentials or copy catalog data.
+After you sign in and approve access in WooCommerce, WooCommerce sends the generated API credentials directly to WISEPIM. The service uses that access for the catalog workflows you choose. The plugin does not store the credentials or copy your catalog data.
 
 Service terms: https://wisepim.com/terms
 Privacy policy: https://wisepim.com/privacy
 
 == Installation ==
 
-1. Install and activate WooCommerce, enable HTTPS, and use pretty permalinks.
-2. Upload the plugin ZIP through Plugins > Add New Plugin > Upload Plugin and activate it.
-3. Open WooCommerce > WISEPIM.
-4. Click Connect to WISEPIM, sign in or create an account, choose your intended project, and approve access.
-5. Continue in WISEPIM to import your catalog.
+1. Install the plugin: upload the ZIP through Plugins > Add New Plugin > Upload Plugin, then activate it.
+2. Connect your store: open WooCommerce > WISEPIM and click Connect to WISEPIM. Sign in or create an account, choose your project, and approve access.
+3. Start with your catalog: open the connected store in WISEPIM and import your catalog. Improve your content, then export the changes you want to use.
 
 == Frequently Asked Questions ==
 
 = Is the plugin free? =
 
-The connector plugin is free software. A WISEPIM account is required, and service capabilities and usage depend on your plan. See the WISEPIM website for current plans.
+Yes. A WISEPIM account is required to work on your catalog. WISEPIM features and usage depend on your plan; see https://wisepim.com/pricing for current plans.
 
-= Does clicking Connect import or publish products? =
+= Do I need to create API keys? =
 
-No. Connecting authorizes the store integration. Choose the catalog workflows you want inside WISEPIM.
+No. WooCommerce creates the credentials and sends them to WISEPIM after you approve access.
 
-= Does the plugin show whether my remote connection is healthy? =
+= Will connecting change my products? =
 
-The plugin shows local setup checks and when a connection was last started. Those are not confirmation that authorization succeeded. Inspect the connection in WISEPIM to verify it.
+Connecting does not import, edit, or publish products. You start those workflows in WISEPIM and choose when to export changes to your store.
+
+= How do I know the connection worked? =
+
+Open your store in WISEPIM to check its connection. The WordPress page shows local setup checks and when you last started connecting; it does not monitor the remote connection.
 
 = How do I disconnect? =
 
-Manage the store connection in WISEPIM and revoke its API key under WooCommerce > Settings > Advanced > REST API. Deactivating or deleting this plugin does not revoke WooCommerce keys or delete remote WISEPIM data.
+Manage the store connection in WISEPIM and revoke its API key under WooCommerce > Settings > Advanced > REST API. Deactivating or deleting this plugin alone does not revoke access or delete data held in WISEPIM.
 
-= What does uninstall remove? =
+= What happens when I delete the plugin? =
 
-Uninstall removes the plugin's local last-connection-attempt timestamp. It preserves products and WooCommerce API keys.
+The plugin removes its saved setup timestamp. Your products and WooCommerce API keys stay intact.
 
-= Why does setup report a problem? =
+= Why can't I connect? =
 
-WooCommerce must be active, your store must use HTTPS, and permalinks must not be set to Plain. Hosting firewalls or security plugins can also block WooCommerce authorization or REST API access; ask your administrator to check those endpoints.
+Check the WISEPIM setup page first. WooCommerce must be active, your store must use HTTPS, and permalinks must not be set to Plain. If those checks pass but authorization fails, a hosting firewall or security plugin may be blocking WooCommerce access. Ask your store administrator to check it.
 
 == Changelog ==
+
+= 0.1.2 =
+* Clarify product benefits, setup steps, pricing, and access controls.
 
 = 0.1.1 =
 * Harden setup validation and multisite cleanup.

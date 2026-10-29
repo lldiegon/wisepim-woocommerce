@@ -4,7 +4,7 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.3
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -90,6 +90,10 @@ The plugin removes its saved setup timestamp. Your products and WooCommerce API 
 Check the WISEPIM setup page first. WooCommerce must be active, your store must use HTTPS, and permalinks must not be set to Plain. If those checks pass but authorization fails, a hosting firewall or security plugin may be blocking WooCommerce access. Ask your store administrator to check it.
 
 == Changelog ==
+
+= 0.2.0 =
+* See local product and variation counts before connecting.
+* Clearer setup guidance, improved mobile layout, and more accessible controls.
 
 = 0.1.3 =
 * Add direct documentation and support links.

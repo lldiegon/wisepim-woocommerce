@@ -17,9 +17,9 @@ defined( 'ABSPATH' ) || exit;
 			<a class="wisepim-open-app" href="<?php echo esc_url( self::APP_URL . '/integrations' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Open WISEPIM', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a>
 		</div>
 		<div class="wisepim-hero-copy">
-			<p class="wisepim-eyebrow"><?php esc_html_e( 'A LITTLE CONNECTION. A BIG HELP.', 'wisepim-for-woocommerce' ); ?></p>
-			<h1><?php esc_html_e( 'Give your products a wise new start.', 'wisepim-for-woocommerce' ); ?></h1>
-			<p><?php esc_html_e( 'Better descriptions. More languages. A catalog you can be proud of. Bring your WooCommerce products into WISEPIM.', 'wisepim-for-woocommerce' ); ?></p>
+			<p class="wisepim-eyebrow"><?php esc_html_e( 'PRODUCT CONTENT, MADE EASIER.', 'wisepim-for-woocommerce' ); ?></p>
+			<h1><?php esc_html_e( 'Turn product data into better product pages.', 'wisepim-for-woocommerce' ); ?></h1>
+			<p><?php esc_html_e( 'Connect your catalog to write descriptions, translate content, and manage product details in one place.', 'wisepim-for-woocommerce' ); ?></p>
 		</div>
 		<img class="wisepim-owl" src="<?php echo esc_url( plugins_url( 'assets/owl-connect.webp', WISEPIM_WOOCOMMERCE_FILE ) ); ?>" alt="" width="250" height="250" />
 	</header>
@@ -27,15 +27,15 @@ defined( 'ABSPATH' ) || exit;
 	<main class="wisepim-content">
 		<section class="wisepim-connect-card" aria-labelledby="wisepim-connect-heading">
 			<div class="wisepim-connect-main">
-				<h2 id="wisepim-connect-heading"><?php esc_html_e( 'Your store is the starting point.', 'wisepim-for-woocommerce' ); ?></h2>
-				<p class="wisepim-description"><?php esc_html_e( 'Sign in or create your WISEPIM account. We have already filled in your store address.', 'wisepim-for-woocommerce' ); ?></p>
+				<h2 id="wisepim-connect-heading"><?php esc_html_e( 'Connect your WooCommerce catalog', 'wisepim-for-woocommerce' ); ?></h2>
+				<p class="wisepim-description"><?php esc_html_e( 'Your store address is ready. Continue to sign in or create your WISEPIM account.', 'wisepim-for-woocommerce' ); ?></p>
 				<div class="wisepim-store"><span class="dashicons dashicons-store" aria-hidden="true"></span><div><span class="wisepim-label"><?php esc_html_e( 'Your WooCommerce store', 'wisepim-for-woocommerce' ); ?></span><strong><?php echo esc_html( self::store_url() ); ?></strong></div></div>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>" />
 					<?php wp_nonce_field( self::ACTION ); ?>
 					<button type="submit" class="button button-primary button-hero wisepim-connect-button" <?php disabled( ! $can_connect ); ?>><?php esc_html_e( 'Connect to WISEPIM', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">→</span></button>
 					<?php if ( ! $can_connect ) : ?>
-						<p class="wisepim-blocked" role="status"><?php esc_html_e( 'Complete the setup checks to continue.', 'wisepim-for-woocommerce' ); ?></p>
+						<p class="wisepim-blocked" role="status"><?php esc_html_e( 'Complete the setup checks to continue.', 'wisepim-for-woocommerce' ); ?> <a href="#wisepim-checks-heading"><?php esc_html_e( 'Review setup checks', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↓</span></a></p>
 					<?php else : ?>
 						<p class="wisepim-reassurance"><span class="dashicons dashicons-lock" aria-hidden="true"></span><?php esc_html_e( 'You approve access. Your products stay unchanged until you choose to update them.', 'wisepim-for-woocommerce' ); ?></p>
 					<?php endif; ?>
@@ -49,8 +49,8 @@ defined( 'ABSPATH' ) || exit;
 			</div>
 			<aside class="wisepim-readiness" aria-labelledby="wisepim-checks-heading">
 				<span class="wisepim-readiness-symbol dashicons <?php echo $can_connect ? 'dashicons-shield-alt' : 'dashicons-admin-tools'; ?>" aria-hidden="true"></span>
-				<h2 id="wisepim-checks-heading"><?php echo $can_connect ? esc_html__( 'Ready for setup', 'wisepim-for-woocommerce' ) : esc_html__( 'A quick check first', 'wisepim-for-woocommerce' ); ?></h2>
-				<p><?php echo $can_connect ? esc_html__( 'Your local store settings are good to go.', 'wisepim-for-woocommerce' ) : esc_html__( 'A few store settings need your attention.', 'wisepim-for-woocommerce' ); ?></p>
+				<h2 id="wisepim-checks-heading"><?php echo $can_connect ? esc_html__( 'Local checks passed', 'wisepim-for-woocommerce' ) : esc_html__( 'Finish your store setup', 'wisepim-for-woocommerce' ); ?></h2>
+				<p><?php echo $can_connect ? esc_html__( 'Next, you will approve access in WooCommerce.', 'wisepim-for-woocommerce' ) : esc_html__( 'A few store settings need your attention.', 'wisepim-for-woocommerce' ); ?></p>
 				<ul class="wisepim-checks">
 					<?php foreach ( $checks as $wisepim_check_key => $wisepim_check ) : ?>
 						<li class="<?php echo $wisepim_check['passed'] ? 'wisepim-check-pass' : 'wisepim-check-fail'; ?>">
@@ -76,8 +76,27 @@ defined( 'ABSPATH' ) || exit;
 			</aside>
 		</section>
 
+
+		<?php if ( $catalog_snapshot['available'] ) : ?>
+			<section class="wisepim-catalog" aria-labelledby="wisepim-catalog-heading">
+				<div class="wisepim-catalog-copy">
+					<h2 id="wisepim-catalog-heading"><?php esc_html_e( 'Your WooCommerce catalog', 'wisepim-for-woocommerce' ); ?></h2>
+					<?php if ( $catalog_snapshot['empty'] ) : ?>
+						<p><?php esc_html_e( 'No products yet? You can connect now and add products later.', 'wisepim-for-woocommerce' ); ?></p>
+						<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=product' ) ); ?>"><?php esc_html_e( 'Add your first product', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">→</span></a>
+					<?php else : ?>
+						<p><?php esc_html_e( 'Counts from WooCommerce. Check WISEPIM for import status.', 'wisepim-for-woocommerce' ); ?></p>
+					<?php endif; ?>
+				</div>
+				<dl class="wisepim-catalog-counts">
+					<div><dt><?php esc_html_e( 'Products', 'wisepim-for-woocommerce' ); ?></dt><dd><?php echo esc_html( number_format_i18n( $catalog_snapshot['products'] ) ); ?></dd></div>
+					<div><dt><?php esc_html_e( 'Variations', 'wisepim-for-woocommerce' ); ?></dt><dd><?php echo esc_html( number_format_i18n( $catalog_snapshot['variations'] ) ); ?></dd></div>
+				</dl>
+			</section>
+		<?php endif; ?>
+
 		<section class="wisepim-next" aria-labelledby="wisepim-next-heading">
-			<h2 id="wisepim-next-heading"><?php esc_html_e( 'Three small steps. Then you are in.', 'wisepim-for-woocommerce' ); ?></h2>
+			<h2 id="wisepim-next-heading"><?php esc_html_e( 'What happens next', 'wisepim-for-woocommerce' ); ?></h2>
 			<ol class="wisepim-steps">
 				<li><span class="wisepim-step-number" aria-hidden="true">01</span><div><h3><?php esc_html_e( 'Choose your workspace', 'wisepim-for-woocommerce' ); ?></h3><p><?php esc_html_e( 'Sign in or create an account, then confirm the project for your store.', 'wisepim-for-woocommerce' ); ?></p></div></li>
 				<li><span class="wisepim-step-number" aria-hidden="true">02</span><div><h3><?php esc_html_e( 'Approve the connection', 'wisepim-for-woocommerce' ); ?></h3><p><?php esc_html_e( 'WooCommerce asks for your permission. No API keys to copy or paste.', 'wisepim-for-woocommerce' ); ?></p></div></li>
@@ -86,7 +105,7 @@ defined( 'ABSPATH' ) || exit;
 		</section>
 
 		<section class="wisepim-help" aria-labelledby="wisepim-help-heading">
-			<div class="wisepim-help-title"><h2 id="wisepim-help-heading"><?php esc_html_e( 'A little help, if you need it.', 'wisepim-for-woocommerce' ); ?></h2><div class="wisepim-help-links"><a href="https://docs.wisepim.com/en/integrations/woocommerce" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Read the documentation', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a><a href="https://wisepim.com/contact" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Talk to our team', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a></div></div>
+			<div class="wisepim-help-title"><h2 id="wisepim-help-heading"><?php esc_html_e( 'Questions before you connect?', 'wisepim-for-woocommerce' ); ?></h2><div class="wisepim-help-links"><a href="https://docs.wisepim.com/en/integrations/woocommerce" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Read the documentation', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a><a href="https://wisepim.com/contact" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Talk to our team', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">↗</span></a></div></div>
 			<details><summary><?php esc_html_e( 'I have already connected my store', 'wisepim-for-woocommerce' ); ?></summary><div class="wisepim-detail-content"><p><?php esc_html_e( 'Open WISEPIM to check your connection, manage imports, or reconnect an existing store. If setup was interrupted, you can start again with the Connect button above.', 'wisepim-for-woocommerce' ); ?></p>
 				<?php if ( $last_attempt ) : ?>
 					<p class="wisepim-muted">

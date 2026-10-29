@@ -10,6 +10,10 @@ $GLOBALS['multisite'] = false;
 $GLOBALS['blog_id'] = 1;
 $GLOBALS['blog_stack'] = array();
 $GLOBALS['site_queries'] = array();
+$GLOBALS['denied_caps'] = array();
+$GLOBALS['count_calls'] = array();
+$GLOBALS['count_throws'] = false;
+$GLOBALS['count_values'] = array();
 function __( $text, $domain = '' ) { return $text; }
 function esc_html__( $text, $domain = '' ) { return htmlspecialchars($text, ENT_QUOTES, 'UTF-8'); }
 function home_url( $path = '' ) { return $GLOBALS['home']; }
@@ -29,7 +33,15 @@ function switch_to_blog( $id ) { $GLOBALS['blog_stack'][] = $GLOBALS['blog_id'];
 function restore_current_blog() { $GLOBALS['blog_id'] = array_pop($GLOBALS['blog_stack']); }
 function update_option( $name, $value, $autoload = null ) { $GLOBALS['options'][$name] = $value; }
 function add_query_arg( $args, $url ) { return $url . '?' . http_build_query($args, '', '&', PHP_QUERY_RFC3986); }
-function current_user_can( $cap ) { $GLOBALS['last_capability'] = $cap; return $GLOBALS['capability']; }
+function current_user_can( $cap ) {
+    $GLOBALS['last_capability'] = $cap;
+    return $GLOBALS['capability'] && !in_array($cap, $GLOBALS['denied_caps'], true);
+}
+function wp_count_posts( $type, $permission = '' ) {
+    $GLOBALS['count_calls'][] = array($type, $permission, $GLOBALS['blog_id']);
+    if ($GLOBALS['count_throws']) { throw new RuntimeException('Count provider unavailable'); }
+    return $GLOBALS['count_values'][$GLOBALS['blog_id']][$type];
+}
 function wp_die( $message, $title = '', $args = array() ) { throw new RuntimeException($message, $args['response']); }
 function check_admin_referer( $action ) {
     if ('wisepim_woocommerce_connect' !== $action || !$GLOBALS['nonce']) { throw new RuntimeException('Nonce failed', 403); }
@@ -59,11 +71,50 @@ check(!isset($GLOBALS['options'][WISEPIM_WooCommerce_Plugin::OPTION]), 'initiali
 check(in_array('admin_post_wisepim_woocommerce_connect', $GLOBALS['hooks'], true), 'authenticated action registered');
 check(!in_array('admin_post_nopriv_wisepim_woocommerce_connect', $GLOBALS['hooks'], true), 'no unauthenticated action registered');
 check(!WISEPIM_WooCommerce_Plugin::can_connect(), 'WooCommerce missing blocks connection');
+check(!WISEPIM_WooCommerce_Plugin::catalog_snapshot()['available'], 'missing WooCommerce hides catalog summary');
+check(count($GLOBALS['count_calls']) === 0, 'missing WooCommerce does not query product counts');
 $_SERVER['REQUEST_METHOD'] = 'POST';
 check(action_status() === 400, 'connect action blocks missing WooCommerce without fatal error');
 check(!isset($GLOBALS['options'][WISEPIM_WooCommerce_Plugin::OPTION]), 'missing WooCommerce action does not record attempt');
 eval('class WooCommerce {}');
 check(WISEPIM_WooCommerce_Plugin::can_connect(), 'HTTPS WooCommerce with pretty permalinks can connect');
+
+$GLOBALS['count_values'][1] = array(
+    'product' => (object) array('publish' => '12', 'private' => 3, 'draft' => 4, 'pending' => 5, 'future' => 6, 'trash' => 900, 'auto-draft' => 800, 'custom' => 700),
+    'product_variation' => (object) array('publish' => 5, 'private' => 2, 'trash' => 600),
+);
+$catalog = WISEPIM_WooCommerce_Plugin::catalog_snapshot();
+check($catalog['available'] && $catalog['products'] === 30 && $catalog['variations'] === 7, 'snapshot totals catalog statuses and keeps variations separate');
+check(!$catalog['empty'], 'nonempty catalog is identified');
+check($GLOBALS['count_calls'] === array(array('product', 'readable', 1), array('product_variation', 'readable', 1)), 'snapshot requests two native readable aggregate counts only');
+foreach (array('manage_woocommerce', 'edit_products', 'edit_others_products', 'edit_published_products', 'edit_private_products', 'read_private_products') as $denied_capability) {
+    $GLOBALS['denied_caps'] = array($denied_capability);
+    $before_queries = count($GLOBALS['count_calls']);
+    $catalog = WISEPIM_WooCommerce_Plugin::catalog_snapshot();
+    check(!$catalog['available'] && !$catalog['empty'], 'restricted capability hides catalog data: ' . $denied_capability);
+    check(count($GLOBALS['count_calls']) === $before_queries, 'restricted role does not query counts');
+}
+$GLOBALS['denied_caps'] = array();
+$GLOBALS['count_values'][1]['product'] = (object) array('publish' => 0, 'trash' => 42, 'auto-draft' => 1);
+$GLOBALS['count_values'][1]['product_variation'] = (object) array('publish' => 0);
+$catalog = WISEPIM_WooCommerce_Plugin::catalog_snapshot();
+check($catalog['available'] && $catalog['empty'] && $catalog['products'] === 0, 'trash and unfinished drafts do not turn an empty store into an active catalog');
+check(WISEPIM_WooCommerce_Plugin::can_connect(), 'empty catalog never prevents connection');
+foreach (array((object) array(), array('publish' => 0), (object) array('publish' => -1), (object) array('publish' => 'unknown'), (object) array('publish' => 1.5), (object) array('publish' => PHP_INT_MAX, 'private' => 1)) as $malformed_count) {
+    $GLOBALS['count_values'][1]['product'] = $malformed_count;
+    check(!WISEPIM_WooCommerce_Plugin::catalog_snapshot()['available'], 'malformed native count hides optional summary');
+}
+$GLOBALS['count_throws'] = true;
+check(!WISEPIM_WooCommerce_Plugin::catalog_snapshot()['available'], 'failed count provider does not take down setup');
+check(WISEPIM_WooCommerce_Plugin::can_connect(), 'optional count failure does not prevent connection');
+$GLOBALS['count_throws'] = false;
+$GLOBALS['count_values'][2] = array('product' => (object) array('publish' => 9), 'product_variation' => (object) array('publish' => 10));
+$GLOBALS['blog_id'] = 2;
+$catalog = WISEPIM_WooCommerce_Plugin::catalog_snapshot();
+check($catalog['products'] === 9 && $catalog['variations'] === 10, 'snapshot reads the current site instead of reusing another site total');
+$GLOBALS['blog_id'] = 1;
+$GLOBALS['count_values'][1] = array('product' => (object) array('publish' => 0), 'product_variation' => (object) array('publish' => 0));
+
 
 $invalid_urls = array(
     'http://shop.example.com', 'https://user:secret@shop.example.com', 'https://shop.example.com/?x=1',
@@ -118,6 +169,7 @@ check(!isset($GLOBALS['options'][WISEPIM_WooCommerce_Plugin::OPTION]), 'bad nonc
 $GLOBALS['nonce'] = true;
 $GLOBALS['home'] = 'http://shop.example.com';
 check(action_status() === 400, 'invalid prerequisites reject connect action');
+check(strpos(WISEPIM_WooCommerce_Plugin::prerequisites()['https']['message'], 'uses HTTP') !== false, 'HTTP store gets a specific hosting and site-address correction');
 $GLOBALS['home'] = 'https://shop.example.com/store/';
 $_POST['redirect_to'] = 'https://attacker.example';
 $_POST['store_url'] = 'https://attacker.example';

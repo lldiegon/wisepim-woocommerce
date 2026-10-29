@@ -108,9 +108,81 @@ final class WISEPIM_WooCommerce_Plugin {
 		return true;
 	}
 
+	/**
+	 * A local catalog summary for managers allowed to view the whole product list.
+	 *
+	 * WordPress caches these two aggregate counts and invalidates them on edits.
+	 * No product records are loaded and no data leaves the current site.
+	 *
+	 * @return array Local counts, or an unavailable result for restricted access.
+	 */
+	public static function catalog_snapshot() {
+		$unavailable = array(
+			'available'  => false,
+			'products'   => 0,
+			'variations' => 0,
+			'empty'      => false,
+		);
+		if ( ! self::woocommerce_active() ) {
+			return $unavailable;
+		}
+		// wp_count_posts scopes private posts, but does not scope other authors' drafts.
+		// Only show whole-catalog totals to users who can manage those products too.
+		foreach ( array( self::CAPABILITY, 'edit_products', 'edit_others_products', 'edit_published_products', 'edit_private_products', 'read_private_products' ) as $capability ) {
+			if ( ! current_user_can( $capability ) ) {
+				return $unavailable;
+			}
+		}
+		try {
+			$products   = self::catalog_count( wp_count_posts( 'product', 'readable' ) );
+			$variations = self::catalog_count( wp_count_posts( 'product_variation', 'readable' ) );
+		} catch ( \Throwable $error ) {
+			// Optional context must not prevent a merchant from connecting their store.
+			return $unavailable;
+		}
+		if ( null === $products || null === $variations ) {
+			return $unavailable;
+		}
+		return array(
+			'available'  => true,
+			'products'   => $products,
+			'variations' => $variations,
+			'empty'      => 0 === $products,
+		);
+	}
+
+	/**
+	 * Count existing catalog entries, excluding trash and unfinished auto-drafts.
+	 *
+	 * @param mixed $counts Native WordPress status counts, which filters may alter.
+	 * @return int|null A total, or null when the count is unavailable or malformed.
+	 */
+	private static function catalog_count( $counts ) {
+		if ( ! is_object( $counts ) || ! isset( $counts->publish ) ) {
+			return null;
+		}
+		$total = 0;
+		foreach ( array( 'publish', 'private', 'draft', 'pending', 'future' ) as $status ) {
+			$value = isset( $counts->{$status} ) ? $counts->{$status} : 0;
+			if ( ! is_numeric( $value ) || 0 > (float) $value || (float) $value !== (float) (int) $value ) {
+				return null;
+			}
+			if ( PHP_INT_MAX - $total < (int) $value ) {
+				return null;
+			}
+			$total += (int) $value;
+		}
+		return $total;
+	}
+
 	/** Local checks only: these do not claim the remote API is reachable. */
 	public static function prerequisites() {
-		$secure = self::is_supported_store_url( self::store_url() );
+		$secure          = self::is_supported_store_url( self::store_url() );
+		$address         = wp_parse_url( self::store_url() );
+		$address_message = __( 'Use your public HTTPS store address on the standard HTTPS port in Settings → General. Local or private addresses, URL credentials, and query strings are not supported.', 'wisepim-for-woocommerce' );
+		if ( is_array( $address ) && isset( $address['scheme'] ) && 'http' === strtolower( $address['scheme'] ) ) {
+			$address_message = __( 'Your store address uses HTTP. Ask your host to enable HTTPS, then update the Site Address in Settings → General.', 'wisepim-for-woocommerce' );
+		}
 		return array(
 			'woocommerce' => array(
 				'label'   => __( 'WooCommerce is active', 'wisepim-for-woocommerce' ),
@@ -120,7 +192,7 @@ final class WISEPIM_WooCommerce_Plugin {
 			'https'       => array(
 				'label'   => __( 'Public HTTPS store address', 'wisepim-for-woocommerce' ),
 				'passed'  => $secure,
-				'message' => __( 'Use your public HTTPS store address on the standard HTTPS port in Settings → General. Local or private addresses, URL credentials, and query strings are not supported.', 'wisepim-for-woocommerce' ),
+				'message' => $address_message,
 			),
 			'permalinks'  => array(
 				'label'   => __( 'Pretty permalinks are enabled', 'wisepim-for-woocommerce' ),
@@ -208,9 +280,10 @@ final class WISEPIM_WooCommerce_Plugin {
 		if ( ! current_user_can( $capability ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'wisepim-for-woocommerce' ), '', array( 'response' => 403 ) );
 		}
-		$checks       = self::prerequisites();
-		$can_connect  = self::can_connect();
-		$last_attempt = absint( get_option( self::OPTION, 0 ) );
+		$checks           = self::prerequisites();
+		$can_connect      = self::can_connect();
+		$last_attempt     = absint( get_option( self::OPTION, 0 ) );
+		$catalog_snapshot = self::catalog_snapshot();
 		require __DIR__ . '/view-admin.php';
 	}
 }

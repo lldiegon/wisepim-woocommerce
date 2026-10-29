@@ -4,7 +4,7 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,10 @@ Uninstall removes the plugin's local last-connection-attempt timestamp. It prese
 WooCommerce must be active, your store must use HTTPS, and permalinks must not be set to Plain. Hosting firewalls or security plugins can also block WooCommerce authorization or REST API access; ask your administrator to check those endpoints.
 
 == Changelog ==
+
+= 0.1.1 =
+* Harden setup validation and multisite cleanup.
+* Restrict release packaging to the reviewed runtime files.
 
 = 0.1.0 =
 * Initial guided WISEPIM connection and local setup diagnostics.

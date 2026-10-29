@@ -3,17 +3,25 @@ on:
   push:
     tags: ['v*']
 permissions:
-  contents: write
+  contents: read
 jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
   release:
+    needs: checks
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: '8.2'
           coverage: none
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
       - run: php tests/run.php
@@ -33,4 +41,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" dist/wisepim-for-woocommerce.zip dist/wisepim-for-woocommerce.zip.sha256 --draft --title "WISEPIM for WooCommerce $RELEASE_TAG" --generate-notes
+        run: gh release create "$RELEASE_TAG" dist/wisepim-for-woocommerce.zip dist/wisepim-for-woocommerce.zip.sha256 --draft --verify-tag --title "WISEPIM for WooCommerce $RELEASE_TAG" --generate-notes

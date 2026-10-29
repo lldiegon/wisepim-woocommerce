@@ -52,21 +52,27 @@ defined( 'ABSPATH' ) || exit;
 				<h2 id="wisepim-checks-heading"><?php echo $can_connect ? esc_html__( 'Ready for setup', 'wisepim-for-woocommerce' ) : esc_html__( 'A quick check first', 'wisepim-for-woocommerce' ); ?></h2>
 				<p><?php echo $can_connect ? esc_html__( 'Your local store settings are good to go.', 'wisepim-for-woocommerce' ) : esc_html__( 'A few store settings need your attention.', 'wisepim-for-woocommerce' ); ?></p>
 				<ul class="wisepim-checks">
-					<?php foreach ( $checks as $wisepim_check ) : ?>
+					<?php foreach ( $checks as $wisepim_check_key => $wisepim_check ) : ?>
 						<li class="<?php echo $wisepim_check['passed'] ? 'wisepim-check-pass' : 'wisepim-check-fail'; ?>">
 							<span class="dashicons <?php echo $wisepim_check['passed'] ? 'dashicons-yes-alt' : 'dashicons-warning'; ?>" aria-hidden="true"></span>
 							<div><strong><?php echo esc_html( $wisepim_check['label'] ); ?></strong><span class="screen-reader-text"><?php echo $wisepim_check['passed'] ? esc_html__( 'Passed', 'wisepim-for-woocommerce' ) : esc_html__( 'Action needed', 'wisepim-for-woocommerce' ); ?></span>
 								<?php if ( ! $wisepim_check['passed'] ) : ?>
 									<p><?php echo esc_html( $wisepim_check['message'] ); ?></p>
+									<?php if ( 'https' === $wisepim_check_key && current_user_can( 'manage_options' ) ) : ?>
+										<a class="wisepim-settings-link" href="<?php echo esc_url( admin_url( 'options-general.php' ) ); ?>"><?php esc_html_e( 'Open site address settings', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">→</span></a>
+									<?php elseif ( 'permalinks' === $wisepim_check_key && current_user_can( 'manage_options' ) ) : ?>
+										<a class="wisepim-settings-link" href="<?php echo esc_url( admin_url( 'options-permalink.php' ) ); ?>"><?php esc_html_e( 'Open permalink settings', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">→</span></a>
+									<?php elseif ( 'woocommerce' === $wisepim_check_key && current_user_can( 'activate_plugins' ) ) : ?>
+										<a class="wisepim-settings-link" href="<?php echo esc_url( admin_url( 'plugins.php' ) ); ?>"><?php esc_html_e( 'Open installed plugins', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">→</span></a>
+									<?php else : ?>
+										<p><?php esc_html_e( 'Ask your WordPress administrator to update this setting.', 'wisepim-for-woocommerce' ); ?></p>
+									<?php endif; ?>
 								<?php endif; ?>
 							</div>
 						</li>
 					<?php endforeach; ?>
 				</ul>
 				<p class="wisepim-readiness-note"><?php esc_html_e( 'Authorization happens next. These checks do not confirm a connection to WISEPIM.', 'wisepim-for-woocommerce' ); ?></p>
-				<?php if ( ! $can_connect && current_user_can( 'manage_options' ) ) : ?>
-					<a class="wisepim-settings-link" href="<?php echo esc_url( admin_url( 'options-permalink.php' ) ); ?>"><?php esc_html_e( 'Open permalink settings', 'wisepim-for-woocommerce' ); ?> <span aria-hidden="true">→</span></a>
-				<?php endif; ?>
 			</aside>
 		</section>
 

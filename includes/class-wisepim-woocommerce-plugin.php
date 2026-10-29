@@ -57,13 +57,60 @@ final class WISEPIM_WooCommerce_Plugin {
 		);
 	}
 
+	/**
+	 * Match the install bridge's public HTTPS address requirements without DNS requests.
+	 *
+	 * @param mixed $raw Store address from the current site's settings.
+	 * @return bool
+	 */
+	public static function is_supported_store_url( $raw ) {
+		if ( ! is_string( $raw ) || strlen( $raw ) > 1000 || preg_match( '/[\x00-\x20\x7f\\\\]/', $raw ) || preg_match( '/%(?:2f|5c|2e|0a|0d)/i', $raw ) ) {
+			return false;
+		}
+		$parts = wp_parse_url( $raw );
+		if ( ! is_array( $parts ) || empty( $parts['host'] ) || ! isset( $parts['scheme'] ) || 'https' !== strtolower( $parts['scheme'] )
+			|| isset( $parts['user'] ) || isset( $parts['pass'] ) || isset( $parts['query'] ) || isset( $parts['fragment'] )
+			|| ( isset( $parts['port'] ) && 443 !== $parts['port'] ) ) {
+			return false;
+		}
+		if ( isset( $parts['path'] ) && preg_match( '#(?:^|/)\.{1,2}(?:/|$)#', $parts['path'] ) ) {
+			return false;
+		}
+		if ( '..' === substr( $parts['host'], -2 ) ) {
+			return false;
+		}
+		$host = strtolower( rtrim( $parts['host'], '.' ) );
+		$ip   = trim( $host, '[]' );
+		if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+			if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+				return false;
+			}
+			if ( false !== strpos( $ip, ':' ) ) {
+				// Global unicast only: excludes mapped-private IPv4, multicast and local ranges.
+				$packed = inet_pton( $ip );
+				return false !== $packed && 0x20 === ( ord( $packed[0] ) & 0xe0 );
+			}
+			$octets = array_map( 'intval', explode( '.', $ip ) );
+			return $octets[0] > 0 && $octets[0] < 224
+				&& ! ( 100 === $octets[0] && $octets[1] >= 64 && $octets[1] <= 127 )
+				&& ! ( 198 === $octets[0] && in_array( $octets[1], array( 18, 19 ), true ) )
+				&& ! ( 192 === $octets[0] && 0 === $octets[1] && 0 === $octets[2] );
+		}
+		// A DNS name needs a non-numeric public suffix; reject alternate numeric IP spellings.
+		if ( strlen( $host ) > 253 || ! preg_match( '/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])$/i', $host ) ) {
+			return false;
+		}
+		foreach ( array( 'localhost', 'local', 'internal', 'intranet', 'lan', 'home.arpa', 'test', 'invalid', 'example' ) as $suffix ) {
+			if ( $host === $suffix || substr( $host, -strlen( '.' . $suffix ) ) === '.' . $suffix ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/** Local checks only: these do not claim the remote API is reachable. */
 	public static function prerequisites() {
-		$parts  = wp_parse_url( self::store_url() );
-		$secure = is_array( $parts ) && isset( $parts['scheme'], $parts['host'] )
-			&& 'https' === strtolower( $parts['scheme'] )
-			&& ! isset( $parts['user'] ) && ! isset( $parts['pass'] )
-			&& ! isset( $parts['query'] ) && ! isset( $parts['fragment'] );
+		$secure = self::is_supported_store_url( self::store_url() );
 		return array(
 			'woocommerce' => array(
 				'label'   => __( 'WooCommerce is active', 'wisepim-for-woocommerce' ),
@@ -71,9 +118,9 @@ final class WISEPIM_WooCommerce_Plugin {
 				'message' => __( 'Install and activate WooCommerce to connect your product catalog.', 'wisepim-for-woocommerce' ),
 			),
 			'https'       => array(
-				'label'   => __( 'Store uses HTTPS', 'wisepim-for-woocommerce' ),
+				'label'   => __( 'Public HTTPS store address', 'wisepim-for-woocommerce' ),
 				'passed'  => $secure,
-				'message' => __( 'Configure a valid HTTPS site address in WordPress Settings → General before connecting.', 'wisepim-for-woocommerce' ),
+				'message' => __( 'Use your public HTTPS store address on the standard HTTPS port in Settings → General. Local or private addresses, URL credentials, and query strings are not supported.', 'wisepim-for-woocommerce' ),
 			),
 			'permalinks'  => array(
 				'label'   => __( 'Pretty permalinks are enabled', 'wisepim-for-woocommerce' ),

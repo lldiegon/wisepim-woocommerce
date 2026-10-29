@@ -6,7 +6,9 @@
 2. Run the checks in `TESTING.md` against the release commit. Record the actual WordPress, WooCommerce, and PHP versions tested. Only then add/update `Tested up to` in `readme.txt` and WooCommerce compatibility header metadata; do not infer compatibility from syntax checks.
 3. Keep the version in `wisepim-for-woocommerce.php` and `Stable tag` in `readme.txt` identical. Update the changelog.
 4. Run `python3 scripts/package.py` and `python3 scripts/test_package.py`. Install the generated ZIP on a clean WordPress site.
-5. Tag the reviewed commit `v0.1.0` (or the matching version). The release workflow reruns checks, builds the ZIP and checksum, and creates a **draft** GitHub release. Review the draft before publishing it.
+5. Tag the reviewed commit `v0.1.1` (or the matching version). The release workflow reruns checks, builds the ZIP and checksum, and creates a **draft** GitHub release. Review the draft before publishing it.
+
+The exact runtime manifest in `scripts/package.py` must be updated when deliberately adding an asset or runtime file. Unlisted files are never packaged.
 
 The package contains only runtime files, the WordPress readme, and license. It excludes tests, CI configuration, documentation, development tooling, caches, secrets, and repository metadata.
 

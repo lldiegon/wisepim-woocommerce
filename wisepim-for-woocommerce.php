@@ -3,7 +3,7 @@
  * Plugin Name: WISEPIM for WooCommerce
  * Plugin URI: https://wisepim.com/connections/woocommerce
  * Description: Connect your WooCommerce catalog to WISEPIM to enrich product content, prepare translations, and manage catalog quality.
- * Version: 0.2.0
+ * Version: 0.2.1
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WISEPIM_WOOCOMMERCE_VERSION', '0.2.0' );
+define( 'WISEPIM_WOOCOMMERCE_VERSION', '0.2.1' );
 define( 'WISEPIM_WOOCOMMERCE_FILE', __FILE__ );
 
 require_once __DIR__ . '/includes/class-wisepim-woocommerce-plugin.php';

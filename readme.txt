@@ -1,10 +1,11 @@
 === WISEPIM for WooCommerce ===
+Contributors: diegowisepim
 Tags: woocommerce, product information, product descriptions, catalog management, ai
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,7 +90,14 @@ The plugin removes its saved setup timestamp. Your products and WooCommerce API 
 
 Check the WISEPIM setup page first. WooCommerce must be active, your store must use HTTPS, and permalinks must not be set to Plain. If those checks pass but authorization fails, a hosting firewall or security plugin may be blocking WooCommerce access. Ask your store administrator to check it.
 
+== Screenshots ==
+
+1. The WISEPIM setup page on a demonstration WooCommerce store, with connection checks and local product and variation counts.
+
 == Changelog ==
+
+= 0.2.1 =
+* Add the verified WordPress.org contributor and setup screenshot caption.
 
 = 0.2.0 =
 * See local product and variation counts before connecting.

@@ -1,0 +1,36 @@
+name: Build release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: php tests/run.php
+      - run: python3 scripts/test_package.py
+      - run: python3 scripts/package.py
+      - name: Match release tag to plugin version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          from pathlib import Path
+          version = re.search(r'^\s*\* Version:\s*(\S+)', Path('wisepim-for-woocommerce.php').read_text(), re.M)[1]
+          assert os.environ['RELEASE_TAG'] == 'v' + version, 'Tag must match plugin version'
+          PY
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" dist/wisepim-for-woocommerce.zip dist/wisepim-for-woocommerce.zip.sha256 --draft --title "WISEPIM for WooCommerce $RELEASE_TAG" --generate-notes
